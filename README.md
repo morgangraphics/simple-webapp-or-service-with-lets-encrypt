@@ -21,20 +21,29 @@
                   ██║     █████╗  ██████╔╝   ██║   ██████╔╝██║   ██║   ██║                                 
                   ██║     ██╔══╝  ██╔══██╗   ██║   ██╔══██╗██║   ██║   ██║                                 
                   ╚██████╗███████╗██║  ██║   ██║   ██████╔╝╚██████╔╝   ██║                                 
-                   ╚═════╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═════╝  ╚═════╝    ╚═╝                                 
-
+                   ╚═════╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═════╝  ╚═════╝    ╚═╝
 ```
 
 [Let's Encrypt](https://letsencrypt.org/) is a free, automated, and open certificate authority brought to you by the nonprofit [Internet Security Research Group (ISRG)](https://www.abetterinternet.org/). [Certbot](https://certbot.eff.org/) is a free, open source software tool for automatically using Let’s Encrypt certificates on manually-administrated websites to enable HTTPS. [Certbot](https://certbot.eff.org/) is made by the Electronic Frontier Foundation (EFF), a 501(c)3 nonprofit based in San Francisco, CA, that defends digital privacy, free speech, and innovation
 
 
 ```
-While the examples here are largely Node based, the concepts are applicable to any application based web server
-were you want to securely deploy an app or service with HTTPS via Let's Encrypt and Certbot
+While the examples here are largely Node based, the concepts are applicable to any application based
+web server where you want to securely deploy an app or service with HTTPS via Let's Encrypt
+and Certbot
 ```
 
 
-**The 4 main goals:**
+```terminal
+
+ ██████╗  ██████╗  █████╗ ██╗     ███████╗
+██╔════╝ ██╔═══██╗██╔══██╗██║     ██╔════╝
+██║  ███╗██║   ██║███████║██║     ███████╗
+██║   ██║██║   ██║██╔══██║██║     ╚════██║
+╚██████╔╝╚██████╔╝██║  ██║███████╗███████║
+ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
+```
+## WHAT DO WE WANT?
 
 *   It should be easy to setup
 *   It should be easy to maintain
@@ -53,7 +62,17 @@ were you want to securely deploy an app or service with HTTPS via Let's Encrypt 
 | Usually runs on some port other than 80                                              | Certificates expire every 90 days                                                                              |
 
 
-**The Problem:**
+```terminal
+
+████████╗██╗  ██╗███████╗    ██████╗ ██████╗  ██████╗ ██████╗ ██╗     ███████╗███╗   ███╗
+╚══██╔══╝██║  ██║██╔════╝    ██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██║     ██╔════╝████╗ ████║
+   ██║   ███████║█████╗      ██████╔╝██████╔╝██║   ██║██████╔╝██║     █████╗  ██╔████╔██║
+   ██║   ██╔══██║██╔══╝      ██╔═══╝ ██╔══██╗██║   ██║██╔══██╗██║     ██╔══╝  ██║╚██╔╝██║
+   ██║   ██║  ██║███████╗    ██║     ██║  ██║╚██████╔╝██████╔╝███████╗███████╗██║ ╚═╝ ██║
+   ╚═╝   ╚═╝  ╚═╝╚══════╝    ╚═╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝╚═╝     ╚═╝
+```
+
+## WHAT DO WE HAVE TO SOLVE
 
 Node running as a non root user trying to access the Let's Encrypt certificate files that are only available to the root user causing an `EACCES: permission denied` error like:
 ```javascript
@@ -71,7 +90,17 @@ Error: EACCES: permission denied, open '/etc/letsencrypt/live/some_domain_name/p
 ```
 
 
-**Potential solutions:**
+```terminal
+
+███████╗ ██████╗ ██╗     ██╗   ██╗████████╗██╗ ██████╗ ███╗   ██╗███████╗██████╗
+██╔════╝██╔═══██╗██║     ██║   ██║╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝╚════██╗
+███████╗██║   ██║██║     ██║   ██║   ██║   ██║██║   ██║██╔██╗ ██║███████╗  ▄███╔╝
+╚════██║██║   ██║██║     ██║   ██║   ██║   ██║██║   ██║██║╚██╗██║╚════██║  ▀▀══╝
+███████║╚██████╔╝███████╗╚██████╔╝   ██║   ██║╚██████╔╝██║ ╚████║███████║  ██╗   
+╚══════╝ ╚═════╝ ╚══════╝ ╚═════╝    ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝  ╚═╝   
+```
+
+## SOME OPTIONS
 
 
 1.  changing public key, private key, and certificate authority file permissions
@@ -96,14 +125,14 @@ e.g. `chmod 755 /etc/letsencrypt/live/some_domain_name/*.pem`
 *   It can potentially interfere with the CertBot script functionality (now or in the future) if there are permissions checks in place
 *   Any user on the system can now access the files
 
----
-
 > Private keys usually have the permissions of 600 (owner: read+write) for a reason. They should only be accessible to the user and not anyone else, the same logic applies with the Let's Encrypt files. We want to keep the private stuff private and secure.
 >
 > *   :heavy_check_mark: It should be easy to setup
 > *   :heavy_check_mark: It should be easy to maintain
 > *   :x: It should be least privilege
 > *   :x: It should not compromise security of the app or the operating system
+
+---
 
 ### Potential Solution 2: Moving pubkey.pem, privkey.pem, and ca.pem files directly into the node application directory
 
@@ -120,14 +149,14 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 *   It can potentially interfere with the CertBot script functionality (now or in the future) it there are permissions checks in place
 *   Any user on the system can now access the files
 
----
-
 > We want to take advantage of what CertBot does and then leave it be. We don't want to introduce any fragility to the process where a script could fail, a symlink disappears etc.
 >
 > *   :heavy_check_mark: It should be easy to setup
 > *   :warning: It should be easy to maintain
 > *   :x: It should be least privilege
 > *   :x: It should not compromise security of the app or the operating system
+
+---
 
 ### Potential Solution 3: Spin up an Apache or NGi&Icy;X and reverse proxy requests to the back end Node app server
 
@@ -143,7 +172,6 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 *   It's an added layer that can makes things harder to diagnose, debug, and maintain
 *   It requires knowledge of Apache or NGi&Icy;X configuration which can a high bar for entry
 
----
 
 > This is an attractive option, albeit an advanced one, if you need to maintain multiple Node apps and/or services or maintain different apps and/or services written in different languages. One possibility is that Apache or NGi&Icy;X can act as a load balancer and handle the HTTPS termination in one place rather than each app and/or service doing so individually
 >
@@ -152,6 +180,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 > *   :heavy_check_mark: It should be least privilege
 > *   :heavy_check_mark: It should not compromise security of the app or the operating system
 
+---
 
 ### Potential Solution 4: Spin up a Docker container and proxy requests to the Node app
 
@@ -169,8 +198,6 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 *   It requires some knowledge of Docker configuration which may be a high bar for entry
 *   `docker run container_name` is inherently more insecure then other options [unless limits are added]([https://github.com/docker/docker-bench-security)
 
----
-
 > This is an attractive option, albeit an advanced one, if you need to maintain multiple Node apps and/or services or maintain different apps and/or services written in different languages. If you already have infrastructure in place to support this option, great. If not, then getting something up quickly, securely and cheaply might be an issue. It's important to know that some official Node images can be [**very insecure**](https://github.com/aquasecurity/trivy). There are many secure options available depending on your needs.
 >
 >*   :x: It should be easy to setup
@@ -182,14 +209,15 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 
 ```terminal
 
-██████╗ ██████╗ ███████╗██████╗ ███████╗ ██████╗ ██╗   ██╗██╗███████╗██╗████████╗███████╗███████╗
-██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔════╝██╔═══██╗██║   ██║██║██╔════╝██║╚══██╔══╝██╔════╝██╔════╝
-██████╔╝██████╔╝█████╗  ██████╔╝█████╗  ██║   ██║██║   ██║██║███████╗██║   ██║   █████╗  ███████╗
-██╔═══╝ ██╔══██╗██╔══╝  ██╔══██╗██╔══╝  ██║▄▄ ██║██║   ██║██║╚════██║██║   ██║   ██╔══╝  ╚════██║
-██║     ██║  ██║███████╗██║  ██║███████╗╚██████╔╝╚██████╔╝██║███████║██║   ██║   ███████╗███████║
-╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝ ╚══▀▀═╝  ╚═════╝ ╚═╝╚══════╝╚═╝   ╚═╝   ╚══════╝╚══════╝
-
+ █████╗     ██████╗ ███████╗████████╗████████╗███████╗██████╗      ██████╗ ██████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+██╔══██╗    ██╔══██╗██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗    ██╔═══██╗██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
+███████║    ██████╔╝█████╗     ██║      ██║   █████╗  ██████╔╝    ██║   ██║██████╔╝   ██║   ██║██║   ██║██╔██╗ ██║
+██╔══██║    ██╔══██╗██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗    ██║   ██║██╔═══╝    ██║   ██║██║   ██║██║╚██╗██║
+██║  ██║    ██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║    ╚██████╔╝██║        ██║   ██║╚██████╔╝██║ ╚████║
+╚═╝  ╚═╝    ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝     ╚═════╝ ╚═╝        ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 ```
+
+## PREREQUISITES
 
 *   You must have a valid domain and that domain must be available via DNS. Lets Encrypt Certificates do not support IP Addresses
 
@@ -209,8 +237,9 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 ██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║   ██║██║   ██║██╔══██╗██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
 ╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝╚██████╔╝██║  ██║██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
-
 ```
+
+## A PATH TO SUCCESS
 
 1.  Install CertBot by opening [https://certbot.eff.org/lets-encrypt/sharedhost-other](https://certbot.eff.org/lets-encrypt/sharedhost-other)  in a new tab. Select My HTTP website is running **None of the above** on **\<YOUR_OPERATING_SYSTEM>**
 
