@@ -28,9 +28,9 @@
 
 
 ```
-While the examples here are largely Node based, the concepts are applicable to any application based
-web server where you want to securely deploy an app or service with HTTPS via Let's Encrypt
-and Certbot
+While the examples here are largely Node based, the concepts are applicable to any application
+based web server where you want to securely deploy an app or service with HTTPS via 
+Let's Encrypt and Certbot
 ```
 
 
@@ -109,7 +109,7 @@ Error: EACCES: permission denied, open '/etc/letsencrypt/live/some_domain_name/p
 1.  using Docker for reverse proxying traffic
 
 There are some creative, disturbing, wrong, or relatively complicated advice on Stack Overflow to get this setup to work.
-Some of the potential solutions above are perfectly valid ways to go about achieving the goal of deploying a Node app with Let's Encrypt but adds a level of complexity that **might be** overkill for the task at hand. We want a simple server to run a website, We don't want to be fighting with a lot infrastructure.
+Some of the potential solutions above are perfectly valid ways to go about achieving the goal of deploying a Node app with Let's Encrypt but adds a level of complexity that **may be** overkill for the task at hand. We want a simple server to run a website or service, We don't want to be fighting with a lot infrastructure.
 
 
 ### Potential Solution 1: Changing pubkey.pem, privkey.pem, and ca.pem file permissions
@@ -125,7 +125,7 @@ e.g. `chmod 755 /etc/letsencrypt/live/some_domain_name/*.pem`
 *   It can potentially interfere with the CertBot script functionality (now or in the future) if there are permissions checks in place
 *   Any user on the system can now access the files
 
-> Private keys usually have the permissions of 600 (owner: read+write) for a reason. They should only be accessible to the user and not anyone else, the same logic applies with the Let's Encrypt files. We want to keep the private stuff private and secure.
+> Private keys usually have the permissions of 600 (owner: read+write), Certificates permissions of 700 (owner: read+write+execute) for a reason. They should only be accessible to the user and not anyone else, the same logic applies with the Let's Encrypt files. We want to keep the private stuff private and secure.
 >
 > *   :heavy_check_mark: It should be easy to setup
 > *   :heavy_check_mark: It should be easy to maintain
@@ -149,7 +149,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 *   It can potentially interfere with the CertBot script functionality (now or in the future) it there are permissions checks in place
 *   Any user on the system can now access the files
 
-> We want to take advantage of what CertBot does and then leave it be. We don't want to introduce any fragility to the process where a script could fail, a symlink disappears etc.
+> We want to take advantage of what CertBot does and then leave it be. We do not want to introduce any fragility to the process where a script could fail, a symlink disappears etc.
 >
 > *   :heavy_check_mark: It should be easy to setup
 > *   :warning: It should be easy to maintain
@@ -169,7 +169,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 
 **Cons**
 *   This could be overkill for the task at hand
-*   It's an added layer that can makes things harder to diagnose, debug, and maintain
+*   It's an added layer that can make things harder to diagnose, debug, and maintain
 *   It requires knowledge of Apache or NGi&Icy;X configuration which can a high bar for entry
 
 
@@ -194,7 +194,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 *   This could be overkill for the task at hand
 *   It requires existing infrastructure to be in place and secured (e.g. Kubernetes, EKS, GKS, Rancher) Docker in Productions is very different than Docker locally
 *   Some official Docker images are outdated and insecure
-*   It's an added layer that can makes things harder to diagnose, debug, and maintain
+*   It's an added layer that can make things harder to diagnose, debug, and maintain
 *   It requires some knowledge of Docker configuration which may be a high bar for entry
 *   `docker run container_name` is inherently more insecure then other options [unless limits are added]([https://github.com/docker/docker-bench-security)
 
@@ -245,7 +245,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 
     ![None Of The Above](./images/none-of-the-above.png)
 
-1.  Follow the instructions for installing cerbot for your OS. Once you have Certbot installed proceed to the next step
+1.  Follow the instructions for installing Certbot for your OS. Once you have installed proceed to the next step
 
 1.  If this is your first time running Certbot. Register your account by replacing `<MY_EMAIL_ADDRESS@MAIL.COM>` below with your real email address
 
@@ -394,7 +394,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     sudo passwd node-user
     ```
 
-1.  We're going to limit who has access to our new certificates files by creating a FACL (File Access Control List). By doing so we only allow the Root user and our new node-user access to the files without exposing them to everyone else.
+1.  We're going to limit who has access to our new certificate files by creating a FACL (File Access Control List). By doing so we only allow the Root user and our new node-user access to the files without exposing them to everyone else.
 
     ```bash
     setfacl --recursive --map "u:user:permissions" <file/dir>
@@ -405,7 +405,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     ```bash
     setfacl --recursive --mask u:node-user:rX /etc/letsencrypt/{live,archive}/<MY_DOMAIN_NAME>/
     ```
-    > This facl states recursively (--recursive) set access for user and Read and Execute permissions (--mask "u:user:permissions") on all letsencrypt direcotries (/etc/letsencrypt/{live,archive}) for mydomain
+    > This FACL states recursively (--recursive) set access for node-user with Read and Execute permissions (--mask "u:user:permissions") on all letsencrypt direcotries (/etc/letsencrypt/{live,archive}) for mydomain
 
 1.  login as the new node-user, enter the password when prompted
 
