@@ -1,4 +1,4 @@
-smoothly# Deploying a secure, simple web application in production with Let's Encrypt & Certbot
+Deploying a secure, simple web application in production with Let's Encrypt & Certbot
 
 
 [Let's Encrypt](https://letsencrypt.org/) is a free, automated, and open certificate authority brought to you by the nonprofit [Internet Security Research Group (ISRG)](https://www.abetterinternet.org/). [Certbot](https://certbot.eff.org/) is a free, open source software tool for automatically using Let’s Encrypt certificates on manually-administrated websites to enable HTTPS. [Certbot](https://certbot.eff.org/) is made by the Electronic Frontier Foundation (EFF), a 501(c)3 nonprofit based in San Francisco, CA, that defends digital privacy, free speech, and innovation
@@ -371,7 +371,27 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 3000
     ```
 
-    > By default many network interfaces are "eth0". If you don't know or want to confirm type `ip addr` or `ifconfig` into your terminal
+    By default many network interfaces are `eth0`, however, this depends on your Operating System. If you don't know, or want to confirm type `ip addr` (Newer \*Nix Distros) or `ifconfig` (Older \*Nix Distros) into your terminal. In the example output below, the interface is `ens33`
+
+    ```bash
+      user@ubuntu: ip addr
+      1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+      link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+      inet 127.0.0.1/8 scope host lo
+         valid_lft forever preferred_lft forever
+      inet6 ::1/128 scope host
+         valid_lft forever preferred_lft forever
+      2: ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+          link/ether 00:0c:29:a4:f1:4a brd ff:ff:ff:ff:ff:ff
+          inet 192.168.0.1/24 brd 192.168.0.255 scope global dynamic ens33
+             valid_lft 1138sec preferred_lft 1138sec
+          inet6 fe80::f53e:89e:b44a:c634/64 scope link
+             valid_lft forever preferred_lft forever
+      3: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default
+          link/ether 02:42:bc:d3:df:97 brd ff:ff:ff:ff:ff:ff
+          inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+             valid_lft forever preferred_lft forever
+    ```
 
     The iptables rules are temporary and will go away on a VM reboot. The rules above state
 
@@ -404,7 +424,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     ```bash
     setfacl --recursive --mask u:node-user:rX /etc/letsencrypt/{live,archive}/<MY_DOMAIN_NAME>/
     ```
-    > This FACL states recursively (--recursive) set access for node-user with Read+Execute permissions (--mask "u:user:permissions") on all letsencrypt direcotries (/etc/letsencrypt/{live,archive}) for mydomain
+    > This FACL states recursively (--recursive) set access for node-user with Read+Execute permissions (--mask "u:user:permissions") on all letsencrypt directories (/etc/letsencrypt/{live,archive}) for mydomain
 
 1.  login as the new node-user, enter the password when prompted
 
@@ -437,4 +457,4 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 
 <a name="conclusion"></a>
 
-If everything went as planned, you should now have a web application running with HTTPS enabled and will automatically renew every 90 days with the help of Certbot's auto-renewal script. If things didn't go smootly, checkout the [Common Issues](common_issues.md) file
+If everything went as planned, you should now have a web application running with HTTPS enabled and will automatically renew every 90 days with the help of Certbot's auto-renewal script. If things didn't go smoothly, checkout the [Common Issues](common_issues.md) file
