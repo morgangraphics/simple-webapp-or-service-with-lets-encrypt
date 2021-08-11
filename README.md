@@ -1,36 +1,33 @@
-# Deploying a simple Web App in Production with
+smoothly# Deploying a secure, simple web application in production with Let's Encrypt & Certbot
 
-```terminal
-
-         ██╗     ███████╗████████╗███████╗    ███████╗███╗   ██╗ ██████╗██████╗ ██╗   ██╗██████╗ ████████╗
-         ██║     ██╔════╝╚══██╔══╝██╔════╝    ██╔════╝████╗  ██║██╔════╝██╔══██╗╚██╗ ██╔╝██╔══██╗╚══██╔══╝
-         ██║     █████╗     ██║   ███████╗    █████╗  ██╔██╗ ██║██║     ██████╔╝ ╚████╔╝ ██████╔╝   ██║   
-         ██║     ██╔══╝     ██║   ╚════██║    ██╔══╝  ██║╚██╗██║██║     ██╔══██╗  ╚██╔╝  ██╔═══╝    ██║   
-         ███████╗███████╗   ██║   ███████║    ███████╗██║ ╚████║╚██████╗██║  ██║   ██║   ██║        ██║   
-         ╚══════╝╚══════╝   ╚═╝   ╚══════╝    ╚══════╝╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝        ╚═╝   
-         
-                                            ██╗                                                           
-                                            ██║                                                           
-                                         ████████╗                                                        
-                                         ██╔═██╔═╝                                                        
-                                         ██████║                                                          
-                                         ╚═════╝                                                          
-
-                  ██████╗███████╗██████╗ ████████╗██████╗  ██████╗ ████████╗                              
-                 ██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔══██╗██╔═══██╗╚══██╔══╝                              
-                 ██║     █████╗  ██████╔╝   ██║   ██████╔╝██║   ██║   ██║                                 
-                 ██║     ██╔══╝  ██╔══██╗   ██║   ██╔══██╗██║   ██║   ██║                                 
-                 ╚██████╗███████╗██║  ██║   ██║   ██████╔╝╚██████╔╝   ██║                                 
-                  ╚═════╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═════╝  ╚═════╝    ╚═╝
-```
 
 [Let's Encrypt](https://letsencrypt.org/) is a free, automated, and open certificate authority brought to you by the nonprofit [Internet Security Research Group (ISRG)](https://www.abetterinternet.org/). [Certbot](https://certbot.eff.org/) is a free, open source software tool for automatically using Let’s Encrypt certificates on manually-administrated websites to enable HTTPS. [Certbot](https://certbot.eff.org/) is made by the Electronic Frontier Foundation (EFF), a 501(c)3 nonprofit based in San Francisco, CA, that defends digital privacy, free speech, and innovation
 
 
-```
-While the examples here are largely Node based, the concepts are applicable to any application
-based web server where you want to securely deploy an app or service with HTTPS via 
-Let's Encrypt and Certbot
+```terminal
+▄▄██                                                                    ██▄▄
+░▄▄▓██████▌                                                      ▐██████▓▄▄░
+▀██▓░▀███       ▄▄▄▄   ▄▄▄▄▄█░                ░█▄▄▄▄▄   ▄▄▄▄       ███▀░▓██▀
+░    ▀██▄ ▀█▓  ▄▄███████▄  ▀▓▀ ▓█▄        ▄█▓ ▀▓▀  ▄███████▄▄  ▓█▀ ▄██▀    ░
+█▄▄  ▀█▓ ▀██▀▀░    ▀▀▓█▒ ░▄▄▄▓███ ░      ░ ███▓▄▄▄░ ▒█▓▀▀    ░▀▀██▀ ▓█▀  ▄▄█
+▒███▓▄▄ ▀█▄            ▀███▓▀▀▀░            ░▀▀▀▓███▀            ▄█▀ ▄▄▓███▒
+▓███▀▀▓█▄███▄            ▀                        ▀            ▄███▄█▓▀▀███▓
+██▓██▄▄ ▀▀▓▓                                                    ▓▓▀▀ ▄▄██▓██
+░▀▀▀███▄                                                            ▄███▀▀▀░
+██████▄██▓              ░:: G R E E T I N G S ::░                 ▓██▄██████
+▓██                                                                      ██▓
+░█▓  While the examples here are largely Node based, the concepts are    ██░
+██   applicable to any application based web server where you want to     ██
+█▓   securely deploy and application or service with HTTPS using          ▓█
+█▓   Let's Encrypt and Certbot                                            ▓█
+█▓                                                                        ▓█
+█▓                                                                        ▓█
+▐███▓▄▄▄▄        ▄▌                                      ▐▄        ▄▄▄▄▓███▌
+▀   ▄██▓  ░▄▄▄▄▄██ ██░   ▄▄█                    █▄▄   ░██ ██▄▄▄▄▄░  ▓██▄   ▀
+▄█████▓██▓▀▀▀██▌▐███▄  ▐▓▓█▄░▄█▄            ▄█▄░▄█▓▓▌  ▄███▌▐██▀▀▀▓██▓█████▄
+▄█▓▀▀▀▀▀      ▓██ ██▓▐█▓ ██  ▀█▀  ▀■    ■▀  ▀█▀  ██ ▓█▌▓██ ██▓      ▀▀▀▀▀▓█▄
+        ███▓███  ▀████▌                              ▐████▀  ███▓███
+       ░▀    ▀▌    █▀                                  ▀█    ▐▀    ▀░
 ```
 
 
@@ -209,19 +206,20 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 
 ```terminal
 
- █████╗     ██████╗ ███████╗████████╗████████╗███████╗██████╗      ██████╗ ██████╗ ████████╗██╗ ██████╗ ███╗   ██╗
-██╔══██╗    ██╔══██╗██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗    ██╔═══██╗██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
-███████║    ██████╔╝█████╗     ██║      ██║   █████╗  ██████╔╝    ██║   ██║██████╔╝   ██║   ██║██║   ██║██╔██╗ ██║
-██╔══██║    ██╔══██╗██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗    ██║   ██║██╔═══╝    ██║   ██║██║   ██║██║╚██╗██║
-██║  ██║    ██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║    ╚██████╔╝██║        ██║   ██║╚██████╔╝██║ ╚████║
-╚═╝  ╚═╝    ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝     ╚═════╝ ╚═╝        ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+ █████╗     ██████╗ ███████╗████████╗████████╗███████╗██████╗     ██╗    ██╗ █████╗ ██╗   ██╗
+██╔══██╗    ██╔══██╗██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗    ██║    ██║██╔══██╗╚██╗ ██╔╝
+███████║    ██████╔╝█████╗     ██║      ██║   █████╗  ██████╔╝    ██║ █╗ ██║███████║ ╚████╔╝
+██╔══██║    ██╔══██╗██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗    ██║███╗██║██╔══██║  ╚██╔╝  
+██║  ██║    ██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║    ╚███╔███╔╝██║  ██║   ██║   
+╚═╝  ╚═╝    ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝     ╚══╝╚══╝ ╚═╝  ╚═╝   ╚═╝   
+
 ```
 
 ## PREREQUISITES
 
 *   You must have a valid domain and that domain must be available via DNS. Lets Encrypt Certificates do not support IP Addresses
 
-*   Your domain needs to be pointing to a VM, Container, or Load Balancer etc. and that VM, Container, or Load Balancer must be reachable on the internet
+*   Your domain needs to be pointing to a VM, Container, or Load Balancer etc. and that VM, Container, or Load Balancer must be reachable on the INTERNET
 
 *   Your VM, Container, or Load Balancer must have SSH access
 
@@ -313,7 +311,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     sudo certbot certonly -d mydomain.com --webroot --webroot-path /home/ubuntu/my_web_app/public
     ```
 
-    Sucessfull output will loook like
+    Successful output will look like
 
     ```terminal
     Saving debug log to /var/log/letsencrypt/letsencrypt.log
@@ -346,7 +344,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     ```
     > As these paths SHOULD NOT change. You can commit these paths in your Environment configuration files, AWS Secrets Manager etc.
 
-1.  Now that we have gotten our certificates installed, lets correct our IPTABLES rules to reflect the right configuration To do this, we need to delete our old rule and add an IP table rule to route traffic from port 80 => 443 and then port 443 to whatever port your app is running on
+1.  Now that we have gotten our certificates installed, lets correct our iptables rules to reflect the right configuration To do this, we need to delete our old rule and add an IP table rule to route traffic from port 80 => 443 and then port 443 to whatever port your app is running on
 
     DELETE:
 
@@ -405,7 +403,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     ```bash
     setfacl --recursive --mask u:node-user:rX /etc/letsencrypt/{live,archive}/<MY_DOMAIN_NAME>/
     ```
-    > This FACL states recursively (--recursive) set access for node-user with Read and Execute permissions (--mask "u:user:permissions") on all letsencrypt direcotries (/etc/letsencrypt/{live,archive}) for mydomain
+    > This FACL states recursively (--recursive) set access for node-user with Read+Execute permissions (--mask "u:user:permissions") on all letsencrypt direcotries (/etc/letsencrypt/{live,archive}) for mydomain
 
 1.  login as the new node-user, enter the password when prompted
 
@@ -438,4 +436,4 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 
 <a name="conclusion"></a>
 
-If everything went as planned, you should now have a web application running with HTTPS enabled and will aoutmatically renew every 90 days with the help of Certbot's autorenewal script. If things didn't go smootly, checkout the [Common Issues](common_issues.md) file
+If everything went as planned, you should now have a web application running with HTTPS enabled and will automatically renew every 90 days with the help of Certbot's auto-renewal script. If things didn't go smootly, checkout the [Common Issues](common_issues.md) file
