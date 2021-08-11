@@ -1,37 +1,55 @@
-# Deploying a simple Web App in Production with
+# Deploying a secure, web application in production with
+
 
 ```terminal
 
-          ██╗     ███████╗████████╗███████╗    ███████╗███╗   ██╗ ██████╗██████╗ ██╗   ██╗██████╗ ████████╗
-          ██║     ██╔════╝╚══██╔══╝██╔════╝    ██╔════╝████╗  ██║██╔════╝██╔══██╗╚██╗ ██╔╝██╔══██╗╚══██╔══╝
-          ██║     █████╗     ██║   ███████╗    █████╗  ██╔██╗ ██║██║     ██████╔╝ ╚████╔╝ ██████╔╝   ██║   
-          ██║     ██╔══╝     ██║   ╚════██║    ██╔══╝  ██║╚██╗██║██║     ██╔══██╗  ╚██╔╝  ██╔═══╝    ██║   
-          ███████╗███████╗   ██║   ███████║    ███████╗██║ ╚████║╚██████╗██║  ██║   ██║   ██║        ██║   
-          ╚══════╝╚══════╝   ╚═╝   ╚══════╝    ╚══════╝╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝        ╚═╝   
+  ██╗     ███████╗████████╗███████╗    ███████╗███╗   ██╗ ██████╗██████╗ ██╗   ██╗██████╗ ████████╗
+  ██║     ██╔════╝╚══██╔══╝██╔════╝    ██╔════╝████╗  ██║██╔════╝██╔══██╗╚██╗ ██╔╝██╔══██╗╚══██╔══╝
+  ██║     █████╗     ██║   ███████╗    █████╗  ██╔██╗ ██║██║     ██████╔╝ ╚████╔╝ ██████╔╝   ██║   
+  ██║     ██╔══╝     ██║   ╚════██║    ██╔══╝  ██║╚██╗██║██║     ██╔══██╗  ╚██╔╝  ██╔═══╝    ██║   
+  ███████╗███████╗   ██║   ███████║    ███████╗██║ ╚████║╚██████╗██║  ██║   ██║   ██║        ██║   
+  ╚══════╝╚══════╝   ╚═╝   ╚══════╝    ╚══════╝╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝        ╚═╝   
 
-                                             ██╗                                                           
-                                             ██║                                                           
-                                          ████████╗                                                        
-                                          ██╔═██╔═╝                                                        
-                                          ██████║                                                          
-                                          ╚═════╝                                                          
+                                               ██╗                                                           
+                                               ██║                                                           
+                                            ████████╗                                                        
+                                            ██╔═██╔═╝                                                        
+                                            ██████║                                                          
+                                            ╚═════╝                                                          
 
-                   ██████╗███████╗██████╗ ████████╗██████╗  ██████╗ ████████╗                              
-                  ██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔══██╗██╔═══██╗╚══██╔══╝                              
-                  ██║     █████╗  ██████╔╝   ██║   ██████╔╝██║   ██║   ██║                                 
-                  ██║     ██╔══╝  ██╔══██╗   ██║   ██╔══██╗██║   ██║   ██║                                 
-                  ╚██████╗███████╗██║  ██║   ██║   ██████╔╝╚██████╔╝   ██║                                 
-                   ╚═════╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═════╝  ╚═════╝    ╚═╝
+                       ██████╗███████╗██████╗ ████████╗██████╗  ██████╗ ████████╗                              
+                      ██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔══██╗██╔═══██╗╚══██╔══╝                              
+                      ██║     █████╗  ██████╔╝   ██║   ██████╔╝██║   ██║   ██║                                 
+                      ██║     ██╔══╝  ██╔══██╗   ██║   ██╔══██╗██║   ██║   ██║                                 
+                      ╚██████╗███████╗██║  ██║   ██║   ██████╔╝╚██████╔╝   ██║                                 
+                       ╚═════╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═════╝  ╚═════╝    ╚═╝
+  ▄▄██                                                                                         ██▄▄
+  ░▄▄▓██████▌                                                                           ▐██████▓▄▄░
+  ▀██▓░▀███       ▄▄▄▄   ▄▄▄▄▄█░                                     ░█▄▄▄▄▄   ▄▄▄▄       ███▀░▓██▀
+  ░    ▀██▄ ▀█▓  ▄▄███████▄  ▀▓▀ ▓█▄                             ▄█▓ ▀▓▀  ▄███████▄▄  ▓█▀ ▄██▀    ░
+  █▄▄  ▀█▓ ▀██▀▀░    ▀▀▓█▒ ░▄▄▄▓███ ░                           ░ ███▓▄▄▄░ ▒█▓▀▀    ░▀▀██▀ ▓█▀  ▄▄█
+  ▒███▓▄▄ ▀█▄            ▀███▓▀▀▀░                                 ░▀▀▀▓███▀            ▄█▀ ▄▄▓███▒
+  ▓███▀▀▓█▄███▄            ▀                                             ▀            ▄███▄█▓▀▀███▓
+  ██▓██▄▄ ▀▀▓▓                                                                         ▓▓▀▀ ▄▄██▓██
+  ░▀▀▀███▄                                                                                 ▄███▀▀▀░
+  ██████▄██▓                           .::  W E L C O M E  ::.                           ▓██▄██████
+  ▓██                                                                                           ██▓
+  ░█▓     While the examples here are largely Node based, the concepts are applicable to any    ██░
+  ██      application based web server where you want to securely deploy any application or      ██
+  █▓      service with HTTPS using Let's Encrypt and Certbot                                     ▓█
+  █▓                                                                                             ▓█
+  █▓                                                                                             ▓█
+  █▓                                                                                             ▓█
+  ▐███▓▄▄▄▄        ▄▌                                                           ▐▄        ▄▄▄▄▓███▌
+  ▀   ▄██▓  ░▄▄▄▄▄██ ██░   ▄▄█                                         █▄▄   ░██ ██▄▄▄▄▄░  ▓██▄   ▀
+  ▄█████▓██▓▀▀▀██▌▐███▄  ▐▓▓█▄░▄█▄                                 ▄█▄░▄█▓▓▌  ▄███▌▐██▀▀▀▓██▓█████▄
+  ▄█▓▀▀▀▀▀      ▓██ ██▓▐█▓ ██  ▀█▀  ▀■                         ■▀  ▀█▀  ██ ▓█▌▓██ ██▓      ▀▀▀▀▀▓█▄
+          ███▓███  ▀████▌                                                   ▐████▀  ███▓███
+         ░▀    ▀▌    █▀                                                       ▀█    ▐▀    ▀░
 ```
+
 
 [Let's Encrypt](https://letsencrypt.org/) is a free, automated, and open certificate authority brought to you by the nonprofit [Internet Security Research Group (ISRG)](https://www.abetterinternet.org/). [Certbot](https://certbot.eff.org/) is a free, open source software tool for automatically using Let’s Encrypt certificates on manually-administrated websites to enable HTTPS. [Certbot](https://certbot.eff.org/) is made by the Electronic Frontier Foundation (EFF), a 501(c)3 nonprofit based in San Francisco, CA, that defends digital privacy, free speech, and innovation
-
-
-```
-While the examples here are largely Node based, the concepts are applicable to any application based
-web server where you want to securely deploy an app or service with HTTPS via Let's Encrypt
-and Certbot
-```
 
 
 ```terminal
@@ -109,7 +127,7 @@ Error: EACCES: permission denied, open '/etc/letsencrypt/live/some_domain_name/p
 1.  using Docker for reverse proxying traffic
 
 There are some creative, disturbing, wrong, or relatively complicated advice on Stack Overflow to get this setup to work.
-Some of the potential solutions above are perfectly valid ways to go about achieving the goal of deploying a Node app with Let's Encrypt but adds a level of complexity that **might be** overkill for the task at hand. We want a simple server to run a website, We don't want to be fighting with a lot infrastructure.
+Some of the potential solutions above are perfectly valid ways to go about achieving the goal of deploying a Node app with Let's Encrypt but adds a level of complexity that **may be** overkill for the task at hand. We want a simple server to run a website or service, We don't want to be fighting with a lot infrastructure.
 
 
 ### Potential Solution 1: Changing pubkey.pem, privkey.pem, and ca.pem file permissions
@@ -125,7 +143,7 @@ e.g. `chmod 755 /etc/letsencrypt/live/some_domain_name/*.pem`
 *   It can potentially interfere with the CertBot script functionality (now or in the future) if there are permissions checks in place
 *   Any user on the system can now access the files
 
-> Private keys usually have the permissions of 600 (owner: read+write) for a reason. They should only be accessible to the user and not anyone else, the same logic applies with the Let's Encrypt files. We want to keep the private stuff private and secure.
+> Private keys usually have the permissions of 600 (owner: read+write), Certificates permissions of 700 (owner: read+write+execute) for a reason. They should only be accessible to the user and not anyone else, the same logic applies with the Let's Encrypt files. We want to keep the private stuff private and secure.
 >
 > *   :heavy_check_mark: It should be easy to setup
 > *   :heavy_check_mark: It should be easy to maintain
@@ -149,7 +167,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 *   It can potentially interfere with the CertBot script functionality (now or in the future) it there are permissions checks in place
 *   Any user on the system can now access the files
 
-> We want to take advantage of what CertBot does and then leave it be. We don't want to introduce any fragility to the process where a script could fail, a symlink disappears etc.
+> We want to take advantage of what CertBot does and then leave it be. We do not want to introduce any fragility to the process where a script could fail, a symlink disappears etc.
 >
 > *   :heavy_check_mark: It should be easy to setup
 > *   :warning: It should be easy to maintain
@@ -169,7 +187,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 
 **Cons**
 *   This could be overkill for the task at hand
-*   It's an added layer that can makes things harder to diagnose, debug, and maintain
+*   It's an added layer that can make things harder to diagnose, debug, and maintain
 *   It requires knowledge of Apache or NGi&Icy;X configuration which can a high bar for entry
 
 
@@ -194,7 +212,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 *   This could be overkill for the task at hand
 *   It requires existing infrastructure to be in place and secured (e.g. Kubernetes, EKS, GKS, Rancher) Docker in Productions is very different than Docker locally
 *   Some official Docker images are outdated and insecure
-*   It's an added layer that can makes things harder to diagnose, debug, and maintain
+*   It's an added layer that can make things harder to diagnose, debug, and maintain
 *   It requires some knowledge of Docker configuration which may be a high bar for entry
 *   `docker run container_name` is inherently more insecure then other options [unless limits are added]([https://github.com/docker/docker-bench-security)
 
@@ -209,19 +227,20 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 
 ```terminal
 
- █████╗     ██████╗ ███████╗████████╗████████╗███████╗██████╗      ██████╗ ██████╗ ████████╗██╗ ██████╗ ███╗   ██╗
-██╔══██╗    ██╔══██╗██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗    ██╔═══██╗██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
-███████║    ██████╔╝█████╗     ██║      ██║   █████╗  ██████╔╝    ██║   ██║██████╔╝   ██║   ██║██║   ██║██╔██╗ ██║
-██╔══██║    ██╔══██╗██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗    ██║   ██║██╔═══╝    ██║   ██║██║   ██║██║╚██╗██║
-██║  ██║    ██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║    ╚██████╔╝██║        ██║   ██║╚██████╔╝██║ ╚████║
-╚═╝  ╚═╝    ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝     ╚═════╝ ╚═╝        ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+ █████╗     ██████╗ ███████╗████████╗████████╗███████╗██████╗     ██╗    ██╗ █████╗ ██╗   ██╗
+██╔══██╗    ██╔══██╗██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗    ██║    ██║██╔══██╗╚██╗ ██╔╝
+███████║    ██████╔╝█████╗     ██║      ██║   █████╗  ██████╔╝    ██║ █╗ ██║███████║ ╚████╔╝
+██╔══██║    ██╔══██╗██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗    ██║███╗██║██╔══██║  ╚██╔╝  
+██║  ██║    ██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║    ╚███╔███╔╝██║  ██║   ██║   
+╚═╝  ╚═╝    ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝     ╚══╝╚══╝ ╚═╝  ╚═╝   ╚═╝   
+
 ```
 
 ## PREREQUISITES
 
 *   You must have a valid domain and that domain must be available via DNS. Lets Encrypt Certificates do not support IP Addresses
 
-*   Your domain needs to be pointing to a VM, Container, or Load Balancer etc. and that VM, Container, or Load Balancer must be reachable on the internet
+*   Your domain needs to be pointing to a VM, Container, or Load Balancer etc. and that VM, Container, or Load Balancer must be reachable on the INTERNET
 
 *   Your VM, Container, or Load Balancer must have SSH access
 
@@ -231,12 +250,13 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 
 ```terminal
 
- ██████╗ ██████╗ ███╗   ██╗███████╗██╗ ██████╗ ██╗   ██╗██████╗  █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
-██╔════╝██╔═══██╗████╗  ██║██╔════╝██║██╔════╝ ██║   ██║██╔══██╗██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
-██║     ██║   ██║██╔██╗ ██║█████╗  ██║██║  ███╗██║   ██║██████╔╝███████║   ██║   ██║██║   ██║██╔██╗ ██║
-██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║   ██║██║   ██║██╔══██╗██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
-╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝╚██████╔╝██║  ██║██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
- ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+██╗     ███████╗████████╗███████╗     ██████╗  ██████╗ ██╗
+██║     ██╔════╝╚══██╔══╝██╔════╝    ██╔════╝ ██╔═══██╗██║
+██║     █████╗     ██║   ███████╗    ██║  ███╗██║   ██║██║
+██║     ██╔══╝     ██║   ╚════██║    ██║   ██║██║   ██║╚═╝
+███████╗███████╗   ██║   ███████║    ╚██████╔╝╚██████╔╝██╗
+╚══════╝╚══════╝   ╚═╝   ╚══════╝     ╚═════╝  ╚═════╝ ╚═╝
+
 ```
 
 ## A PATH TO SUCCESS
@@ -245,7 +265,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 
     ![None Of The Above](./images/none-of-the-above.png)
 
-1.  Follow the instructions for installing cerbot for your OS. Once you have Certbot installed proceed to the next step
+1.  Follow the instructions for installing Certbot for your OS. Once you have installed proceed to the next step
 
 1.  If this is your first time running Certbot. Register your account by replacing `<MY_EMAIL_ADDRESS@MAIL.COM>` below with your real email address
 
@@ -313,7 +333,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     sudo certbot certonly -d mydomain.com --webroot --webroot-path /home/ubuntu/my_web_app/public
     ```
 
-    Sucessfull output will loook like
+    Successful output will look like
 
     ```terminal
     Saving debug log to /var/log/letsencrypt/letsencrypt.log
@@ -346,7 +366,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     ```
     > As these paths SHOULD NOT change. You can commit these paths in your Environment configuration files, AWS Secrets Manager etc.
 
-1.  Now that we have gotten our certificates installed, lets correct our IPTABLES rules to reflect the right configuration To do this, we need to delete our old rule and add an IP table rule to route traffic from port 80 => 443 and then port 443 to whatever port your app is running on
+1.  Now that we have gotten our certificates installed, lets correct our iptables rules to reflect the right configuration To do this, we need to delete our old rule and add an IP table rule to route traffic from port 80 => 443 and then port 443 to whatever port your app is running on
 
     DELETE:
 
@@ -372,7 +392,29 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 3000
     ```
 
-    > By default many network interfaces are "eth0". If you don't know or want to confirm type `ip addr` or `ifconfig` into your terminal
+    By default many network interfaces are `eth0`, however, this really depends on your Operating System and Version of Operating System. If you don't know whatyour network interface is, or want to confirm type `ip addr` (Newer \*Nix Distros) or `ifconfig` (Older \*Nix Distros) into your terminal. In the example output below, the interface is `ens33`
+
+    e.g.
+
+    ```bash
+      user@ubuntu: ip addr
+      1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+      link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+      inet 127.0.0.1/8 scope host lo
+         valid_lft forever preferred_lft forever
+      inet6 ::1/128 scope host
+         valid_lft forever preferred_lft forever
+      2: ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+          link/ether 00:0c:29:a4:f1:4a brd ff:ff:ff:ff:ff:ff
+          inet 192.168.0.1/24 brd 192.168.0.255 scope global dynamic ens33
+             valid_lft 1138sec preferred_lft 1138sec
+          inet6 fe80::f53e:89e:b44a:c634/64 scope link
+             valid_lft forever preferred_lft forever
+      3: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default
+          link/ether 02:42:bc:d3:df:97 brd ff:ff:ff:ff:ff:ff
+          inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+             valid_lft forever preferred_lft forever
+    ```
 
     The iptables rules are temporary and will go away on a VM reboot. The rules above state
 
@@ -394,7 +436,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     sudo passwd node-user
     ```
 
-1.  We're going to limit who has access to our new certificates files by creating a FACL (File Access Control List). By doing so we only allow the Root user and our new node-user access to the files without exposing them to everyone else.
+1.  We're going to limit who has access to our new certificate files by creating a FACL (File Access Control List). By doing so we only allow the Root user and our new node-user access to the files without exposing them to everyone else.
 
     ```bash
     setfacl --recursive --map "u:user:permissions" <file/dir>
@@ -405,7 +447,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     ```bash
     setfacl --recursive --mask u:node-user:rX /etc/letsencrypt/{live,archive}/<MY_DOMAIN_NAME>/
     ```
-    > This facl states recursively (--recursive) set access for user and Read and Execute permissions (--mask "u:user:permissions") on all letsencrypt direcotries (/etc/letsencrypt/{live,archive}) for mydomain
+    > This FACL states recursively (--recursive) set access for node-user with Read+Execute permissions (--mask "u:user:permissions") on all letsencrypt directories (/etc/letsencrypt/{live,archive}) for mydomain
 
 1.  login as the new node-user, enter the password when prompted
 
@@ -438,4 +480,4 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 
 <a name="conclusion"></a>
 
-If everything went as planned, you should now have a web application running with HTTPS enabled and will aoutmatically renew every 90 days with the help of Certbot's autorenewal script. If things didn't go smootly, checkout the [Common Issues](common_issues.md) file
+If everything went as planned, you should now have a web application running with HTTPS enabled and will automatically renew every 90 days with the help of Certbot's auto-renewal script. If things didn't go smoothly, checkout the [Common Issues](common_issues.md) file
