@@ -1,6 +1,5 @@
 # Deploying a secure, web application in production with
 
-
 ```terminal
 
   ██╗     ███████╗████████╗███████╗    ███████╗███╗   ██╗ ██████╗██████╗ ██╗   ██╗██████╗ ████████╗
