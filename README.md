@@ -1,10 +1,28 @@
-# Deploying a secure, simple web application in production with Let's Encrypt & Certbot
-
-
-[Let's Encrypt](https://letsencrypt.org/) is a free, automated, and open certificate authority brought to you by the nonprofit [Internet Security Research Group (ISRG)](https://www.abetterinternet.org/). [Certbot](https://certbot.eff.org/) is a free, open source software tool for automatically using Let’s Encrypt certificates on manually-administrated websites to enable HTTPS. [Certbot](https://certbot.eff.org/) is made by the Electronic Frontier Foundation (EFF), a 501(c)3 nonprofit based in San Francisco, CA, that defends digital privacy, free speech, and innovation
+# Deploying a secure, web application in production with
 
 
 ```terminal
+
+  ██╗     ███████╗████████╗███████╗    ███████╗███╗   ██╗ ██████╗██████╗ ██╗   ██╗██████╗ ████████╗
+  ██║     ██╔════╝╚══██╔══╝██╔════╝    ██╔════╝████╗  ██║██╔════╝██╔══██╗╚██╗ ██╔╝██╔══██╗╚══██╔══╝
+  ██║     █████╗     ██║   ███████╗    █████╗  ██╔██╗ ██║██║     ██████╔╝ ╚████╔╝ ██████╔╝   ██║   
+  ██║     ██╔══╝     ██║   ╚════██║    ██╔══╝  ██║╚██╗██║██║     ██╔══██╗  ╚██╔╝  ██╔═══╝    ██║   
+  ███████╗███████╗   ██║   ███████║    ███████╗██║ ╚████║╚██████╗██║  ██║   ██║   ██║        ██║   
+  ╚══════╝╚══════╝   ╚═╝   ╚══════╝    ╚══════╝╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝        ╚═╝   
+
+                                               ██╗                                                           
+                                               ██║                                                           
+                                            ████████╗                                                        
+                                            ██╔═██╔═╝                                                        
+                                            ██████║                                                          
+                                            ╚═════╝                                                          
+
+                       ██████╗███████╗██████╗ ████████╗██████╗  ██████╗ ████████╗                              
+                      ██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔══██╗██╔═══██╗╚══██╔══╝                              
+                      ██║     █████╗  ██████╔╝   ██║   ██████╔╝██║   ██║   ██║                                 
+                      ██║     ██╔══╝  ██╔══██╗   ██║   ██╔══██╗██║   ██║   ██║                                 
+                      ╚██████╗███████╗██║  ██║   ██║   ██████╔╝╚██████╔╝   ██║                                 
+                       ╚═════╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═════╝  ╚═════╝    ╚═╝
   ▄▄██                                                                                         ██▄▄
   ░▄▄▓██████▌                                                                           ▐██████▓▄▄░
   ▀██▓░▀███       ▄▄▄▄   ▄▄▄▄▄█░                                     ░█▄▄▄▄▄   ▄▄▄▄       ███▀░▓██▀
@@ -14,7 +32,7 @@
   ▓███▀▀▓█▄███▄            ▀                                             ▀            ▄███▄█▓▀▀███▓
   ██▓██▄▄ ▀▀▓▓                                                                         ▓▓▀▀ ▄▄██▓██
   ░▀▀▀███▄                                                                                 ▄███▀▀▀░
-  ██████▄██▓                          .░::  W E L C O M E ::░.                           ▓██▄██████
+  ██████▄██▓                           .::  W E L C O M E  ::.                           ▓██▄██████
   ▓██                                                                                           ██▓
   ░█▓     While the examples here are largely Node based, the concepts are applicable to any    ██░
   ██      application based web server where you want to securely deploy any application or      ██
@@ -29,6 +47,9 @@
           ███▓███  ▀████▌                                                   ▐████▀  ███▓███
          ░▀    ▀▌    █▀                                                       ▀█    ▐▀    ▀░
 ```
+
+
+[Let's Encrypt](https://letsencrypt.org/) is a free, automated, and open certificate authority brought to you by the nonprofit [Internet Security Research Group (ISRG)](https://www.abetterinternet.org/). [Certbot](https://certbot.eff.org/) is a free, open source software tool for automatically using Let’s Encrypt certificates on manually-administrated websites to enable HTTPS. [Certbot](https://certbot.eff.org/) is made by the Electronic Frontier Foundation (EFF), a 501(c)3 nonprofit based in San Francisco, CA, that defends digital privacy, free speech, and innovation
 
 
 ```terminal
@@ -371,7 +392,9 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 3000
     ```
 
-    By default many network interfaces are `eth0`, however, this depends on your Operating System. If you don't know, or want to confirm type `ip addr` (Newer \*Nix Distros) or `ifconfig` (Older \*Nix Distros) into your terminal. In the example output below, the interface is `ens33`
+    By default many network interfaces are `eth0`, however, this really depends on your Operating System and Version of Operating System. If you don't know whatyour network interface is, or want to confirm type `ip addr` (Newer \*Nix Distros) or `ifconfig` (Older \*Nix Distros) into your terminal. In the example output below, the interface is `ens33`
+
+    e.g.
 
     ```bash
       user@ubuntu: ip addr
