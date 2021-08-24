@@ -1,50 +1,49 @@
 # Deploying a secure web application in production with
 
 ```terminal
+██╗     ███████╗████████╗███████╗    ███████╗███╗   ██╗ ██████╗██████╗ ██╗   ██╗██████╗ ████████╗
+██║     ██╔════╝╚══██╔══╝██╔════╝    ██╔════╝████╗  ██║██╔════╝██╔══██╗╚██╗ ██╔╝██╔══██╗╚══██╔══╝
+██║     █████╗     ██║   ███████╗    █████╗  ██╔██╗ ██║██║     ██████╔╝ ╚████╔╝ ██████╔╝   ██║   
+██║     ██╔══╝     ██║   ╚════██║    ██╔══╝  ██║╚██╗██║██║     ██╔══██╗  ╚██╔╝  ██╔═══╝    ██║   
+███████╗███████╗   ██║   ███████║    ███████╗██║ ╚████║╚██████╗██║  ██║   ██║   ██║        ██║   
+╚══════╝╚══════╝   ╚═╝   ╚══════╝    ╚══════╝╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝        ╚═╝   
 
-  ██╗     ███████╗████████╗███████╗    ███████╗███╗   ██╗ ██████╗██████╗ ██╗   ██╗██████╗ ████████╗
-  ██║     ██╔════╝╚══██╔══╝██╔════╝    ██╔════╝████╗  ██║██╔════╝██╔══██╗╚██╗ ██╔╝██╔══██╗╚══██╔══╝
-  ██║     █████╗     ██║   ███████╗    █████╗  ██╔██╗ ██║██║     ██████╔╝ ╚████╔╝ ██████╔╝   ██║   
-  ██║     ██╔══╝     ██║   ╚════██║    ██╔══╝  ██║╚██╗██║██║     ██╔══██╗  ╚██╔╝  ██╔═══╝    ██║   
-  ███████╗███████╗   ██║   ███████║    ███████╗██║ ╚████║╚██████╗██║  ██║   ██║   ██║        ██║   
-  ╚══════╝╚══════╝   ╚═╝   ╚══════╝    ╚══════╝╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝        ╚═╝   
+                                             ██╗                                                           
+                                             ██║                                                           
+                                          ████████╗                                                        
+                                          ██╔═██╔═╝                                                        
+                                          ██████║                                                          
+                                          ╚═════╝                                                          
 
-                                               ██╗                                                           
-                                               ██║                                                           
-                                            ████████╗                                                        
-                                            ██╔═██╔═╝                                                        
-                                            ██████║                                                          
-                                            ╚═════╝                                                          
-
-                       ██████╗███████╗██████╗ ████████╗██████╗  ██████╗ ████████╗                              
-                      ██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔══██╗██╔═══██╗╚══██╔══╝                              
-                      ██║     █████╗  ██████╔╝   ██║   ██████╔╝██║   ██║   ██║                                 
-                      ██║     ██╔══╝  ██╔══██╗   ██║   ██╔══██╗██║   ██║   ██║                                 
-                      ╚██████╗███████╗██║  ██║   ██║   ██████╔╝╚██████╔╝   ██║                                 
-                       ╚═════╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═════╝  ╚═════╝    ╚═╝
-  ▄▄██                                                                                         ██▄▄
-  ░▄▄▓██████▌                                                                           ▐██████▓▄▄░
-  ▀██▓░▀███       ▄▄▄▄   ▄▄▄▄▄█░                                     ░█▄▄▄▄▄   ▄▄▄▄       ███▀░▓██▀
-  ░    ▀██▄ ▀█▓  ▄▄███████▄  ▀▓▀ ▓█▄                             ▄█▓ ▀▓▀  ▄███████▄▄  ▓█▀ ▄██▀    ░
-  █▄▄  ▀█▓ ▀██▀▀░    ▀▀▓█▒ ░▄▄▄▓███ ░                           ░ ███▓▄▄▄░ ▒█▓▀▀    ░▀▀██▀ ▓█▀  ▄▄█
-  ▒███▓▄▄ ▀█▄            ▀███▓▀▀▀░                                 ░▀▀▀▓███▀            ▄█▀ ▄▄▓███▒
-  ▓███▀▀▓█▄███▄            ▀                                             ▀            ▄███▄█▓▀▀███▓
-  ██▓██▄▄ ▀▀▓▓                                                                         ▓▓▀▀ ▄▄██▓██
-  ░▀▀▀███▄                                                                                 ▄███▀▀▀░
-  ██████▄██▓                           .::  W E L C O M E  ::.                           ▓██▄██████
-  ▓██                                                                                           ██▓
-  ░█▓     While the examples here are largely Node based, the concepts are applicable to any    ██░
-  ██      application based web server where you want to securely deploy any application or      ██
-  █▓      service with HTTPS using Let's Encrypt and Certbot                                     ▓█
-  █▓                                                                                             ▓█
-  █▓                                                                                             ▓█
-  █▓                                                                                             ▓█
-  ▐███▓▄▄▄▄        ▄▌                                                           ▐▄        ▄▄▄▄▓███▌
-  ▀   ▄██▓  ░▄▄▄▄▄██ ██░   ▄▄█                                         █▄▄   ░██ ██▄▄▄▄▄░  ▓██▄   ▀
-  ▄█████▓██▓▀▀▀██▌▐███▄  ▐▓▓█▄░▄█▄                                 ▄█▄░▄█▓▓▌  ▄███▌▐██▀▀▀▓██▓█████▄
-  ▄█▓▀▀▀▀▀      ▓██ ██▓▐█▓ ██  ▀█▀  ▀■                         ■▀  ▀█▀  ██ ▓█▌▓██ ██▓      ▀▀▀▀▀▓█▄
-          ███▓███  ▀████▌                                                   ▐████▀  ███▓███
-         ░▀    ▀▌    █▀                                                       ▀█    ▐▀    ▀░
+                     ██████╗███████╗██████╗ ████████╗██████╗  ██████╗ ████████╗                              
+                    ██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔══██╗██╔═══██╗╚══██╔══╝                              
+                    ██║     █████╗  ██████╔╝   ██║   ██████╔╝██║   ██║   ██║                                 
+                    ██║     ██╔══╝  ██╔══██╗   ██║   ██╔══██╗██║   ██║   ██║                                 
+                    ╚██████╗███████╗██║  ██║   ██║   ██████╔╝╚██████╔╝   ██║                                 
+                     ╚═════╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═════╝  ╚═════╝    ╚═╝
+▄▄██                                                                                         ██▄▄
+░▄▄▓██████▌                                                                           ▐██████▓▄▄░
+▀██▓░▀███       ▄▄▄▄   ▄▄▄▄▄█░                                     ░█▄▄▄▄▄   ▄▄▄▄       ███▀░▓██▀
+░    ▀██▄ ▀█▓  ▄▄███████▄  ▀▓▀ ▓█▄                             ▄█▓ ▀▓▀  ▄███████▄▄  ▓█▀ ▄██▀    ░
+█▄▄  ▀█▓ ▀██▀▀░    ▀▀▓█▒ ░▄▄▄▓███ ░                           ░ ███▓▄▄▄░ ▒█▓▀▀    ░▀▀██▀ ▓█▀  ▄▄█
+▒███▓▄▄ ▀█▄            ▀███▓▀▀▀░                                 ░▀▀▀▓███▀            ▄█▀ ▄▄▓███▒
+▓███▀▀▓█▄███▄            ▀                                             ▀            ▄███▄█▓▀▀███▓
+██▓██▄▄ ▀▀▓▓                                                                         ▓▓▀▀ ▄▄██▓██
+░▀▀▀███▄                                                                                 ▄███▀▀▀░
+██████▄██▓                           .::  W E L C O M E  ::.                           ▓██▄██████
+▓██                                                                                           ██▓
+░█▓     While the examples here are largely Node based, the concepts are applicable to any    ██░
+██      application based web server where you want to securely deploy any application or      ██
+█▓      service with HTTPS using Let's Encrypt and Certbot                                     ▓█
+█▓                                                                                             ▓█
+█▓                                                                                             ▓█
+█▓                                                                                             ▓█
+▐███▓▄▄▄▄        ▄▌                                                           ▐▄        ▄▄▄▄▓███▌
+▀   ▄██▓  ░▄▄▄▄▄██ ██░   ▄▄█                                         █▄▄   ░██ ██▄▄▄▄▄░  ▓██▄   ▀
+▄█████▓██▓▀▀▀██▌▐███▄  ▐▓▓█▄░▄█▄                                 ▄█▄░▄█▓▓▌  ▄███▌▐██▀▀▀▓██▓█████▄
+▄█▓▀▀▀▀▀      ▓██ ██▓▐█▓ ██  ▀█▀  ▀■                         ■▀  ▀█▀  ██ ▓█▌▓██ ██▓      ▀▀▀▀▀▓█▄
+        ███▓███  ▀████▌                                                   ▐████▀  ███▓███
+       ░▀    ▀▌    █▀                                                       ▀█    ▐▀    ▀░
 ```
 
 
@@ -74,7 +73,7 @@ Unless you are specifically trying to [create a way to get around captive portal
 
 1.  It's free, and it's automated. It will cost you nothing other than your time. Set it up once, you won't have to touch it again. This article should help reduce your time adding HTTPS to your app/service easier.
 
-1.  An oft told tale of [man-in-the-middle attack](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) is touted as a primary reason behind securing your app/service.The basic idea being that some bad actor takes the time to impersonate, and/or alter, or steal your data while in flight. While this may still be true, it's considerably easier, and far more likely, that someone would look at for your unencrypted data in the numerous log files of all the devices between the end users browser and the server, including wireless access points, routers, switches, modems, and firewalls. When seen in this is context, and the potential for exposure of your unencrypted data, HTTPS seems like a better approach to secure what is important.
+1.  An oft told tale of [man-in-the-middle attack](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) is touted as a primary reason behind securing your app/service.The basic idea being that some bad actor takes the time to impersonate, and/or alter, or steal your data while in flight. While this may still be true, it's considerably easier, and far more likely, that someone would look for your unencrypted data in the numerous log files of all the devices between the end users browser and the server, including wireless access points, routers, switches, modems, and firewalls. When seen in this is context, and the potential for exposure of your unencrypted data, HTTPS seems like a better approach to secure what is important.
 
 1.  In August 2014 Google HTTPS Everywhere initiative began using [HTTPS as a ranking signal](https://security.googleblog.com/2014/08/https-as-ranking-signal_6.html) to give HTTPS related sites priority over HTTP websites. While not a primary signal of rank, it is a factor, and if your web app/service is public, having HTTPS in place legitimizes your hard work. People are far likelier to use your stuff if they don't seen warnings like:
 
@@ -212,7 +211,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 
 <br>
 
-### Potential Solution 3: Spin up an Apache or NGi&Icy;X and reverse proxy requests to the back end Node app server
+### Potential Solution 3: Spin up an Apache or NGi&Icy;X webs erver and reverse proxy requests to the back end Node app server
 
 **Pros**
 *   It works
@@ -246,7 +245,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
 
 **Cons**
 *   This could be overkill for the task at hand
-*   It requires existing infrastructure to be in place and secured (e.g. Kubernetes, EKS, GKS, Rancher) Docker in Productions is very different than Docker locally
+*   It requires existing infrastructure to be in place and secured (e.g. Kubernetes, EKS, GKS, Rancher) Running Docker in production is **very different** than Docker locally
 *   Some official Docker images are outdated and insecure
 *   It's an added layer that can make things harder to diagnose, debug, and maintain
 *   It requires some knowledge of Docker configuration which may be a high bar for entry
@@ -470,7 +469,7 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     ```
 
-    > Doing it this way prevents having to manually add a file with the validation key to the public folder or your app/service
+    > Doing it this way prevents having to manually add a file with the validation key to the public folder of your app/service
 
 1.  Next, stop your app/service and update the HTTPS/TLS configuration paths in your app/service
 
@@ -488,6 +487,17 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
         key: fs.readFileSync('/etc/letsencrypt/live/<MY_DOMAIN_NAME>/privkey.pem'),
     });
     ```
+
+    e.g.
+
+    ```javascript
+    const tls_svr = http2.createSecureServer({
+        ca: fs.readFileSync('/etc/letsencrypt/live/mydomain.com/ca.pem'),
+        cert: fs.readFileSync('/etc/letsencrypt/live/mydomain.com/cert.pem'),
+        key: fs.readFileSync('/etc/letsencrypt/live/mydomain.com/privkey.pem'),
+    });
+    ```
+
     > As these paths SHOULD NOT change. You can commit file containing these paths in your Source Code Management tool, environment configuration files, AWS Secrets Manager etc.
 
     Exit out of `node-user`
@@ -537,6 +547,26 @@ e.g. `cp /etc/letsencrypt/archive/some_domain_name/* some_path/ && chmod 755 som
     1.  Intercept any traffic coming across the eth0 network interface on port 443 and redirect that traffic to port 3000
 
     **:point_right: [Make these iptables rules permanent](iptables.md)**
+
+1.  Optonal: Verify iptables rules have been updated as expected
+
+    ```bash
+     sudo iptables --list --table nat
+    ```
+
+    > If the iptables rules do not look like:
+    > ```bash
+    > Chain PREROUTING (policy ACCEPT)
+    > target     prot opt source               destination         
+    > REDIRECT   tcp  --  anywhere             anywhere             tcp dpt:https redir ports 3000
+    > REDIRECT   tcp  --  anywhere             anywhere             tcp dpt:http redir ports 443
+    > ```
+    > or an old dule is still present, you can delete a rule by replaceing the -A with a -D
+    >
+    > e.g.
+    > ```bash
+    > sudo iptables -t nat -D PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 3000
+    > ```
 
 1.  We're going to limit who has access to our new certificate files by creating a FACL (File Access Control List). By doing so we only allow the root-user and our new node-user access to the files without exposing the files to anyone else.
 
