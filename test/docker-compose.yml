@@ -1,0 +1,7 @@
+services:
+  acme-filter-test:
+    build: .
+    cap_add:
+      - NET_ADMIN   # required to run iptables inside the container
+      - NET_RAW     # required for raw packet operations
+    command: /test/run_tests.sh
