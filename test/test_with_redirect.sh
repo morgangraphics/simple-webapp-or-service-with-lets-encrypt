@@ -1,16 +1,27 @@
 #!/bin/bash
 # test_with_redirect.sh
 #
-# Validates the FULL production-equivalent pipeline:
+# Validates the FULL production-equivalent pipeline for Let's Encrypt renewal:
 #
-#   PREROUTING nat:  port 80  → port 443   (redirect)
-#   PREROUTING nat:  port 443 → port 8080  (app port, simulating 3000)
+#   PREROUTING nat:  port 80 → port 8080   (app port, simulating 3000)
 #   INPUT filter:    conntrack --ctorigdstport 80 + string match → ACCEPT/DROP
 #
-# KEY POINT: After PREROUTING REDIRECT the INPUT chain sees the post-NAT port
-# (e.g. 8080), NOT the original port 80. Using --dport 80 in INPUT will NOT
-# match. We use conntrack --ctorigdstport 80 to identify packets that were
-# originally destined for port 80 before NAT rewrote them.
+# WHY NO 443 HOP:
+#   Let's Encrypt HTTP-01 validation sends plain HTTP to port 80.
+#   In the post-cert production setup the normal user path is 80→443→3000
+#   (TLS app). Routing LE plain-HTTP traffic through 443 would hit the TLS
+#   listener and FAIL the handshake (the app sees raw HTTP bytes, not a TLS
+#   ClientHello). Port 80→3000 DIRECT is the correct path for webroot renewal.
+#
+#   The production renewal flow uses certbot pre/post hooks to temporarily
+#   swap the iptables rule from (80→443) to (80→3000) for validation, then
+#   back again. See renewal-hooks/ in this test directory.
+#
+# KEY POINT ON conntrack:
+#   After PREROUTING REDIRECT the INPUT chain sees the post-NAT port (8080),
+#   NOT the original port 80. Using --dport 80 in INPUT will NOT match.
+#   We use conntrack --ctorigdstport 80 to identify packets originally
+#   destined for port 80 before NAT rewrote them.
 #
 # Requires: iptables, python3, curl (all present in the test Dockerfile)
 # Run inside the Docker container via: docker compose up --build
@@ -32,10 +43,8 @@ cleanup() {
   info "Cleaning up..."
   kill "$SERVER_PID" 2>/dev/null || true
 
-  # Remove PREROUTING redirect rules
+  # Remove PREROUTING redirect rule (80 → APP_PORT direct — no 443 hop)
   iptables -t nat -D PREROUTING -i "$IFACE" -p tcp --dport 80 \
-    -j REDIRECT --to-port 443 2>/dev/null || true
-  iptables -t nat -D PREROUTING -i "$IFACE" -p tcp --dport 443 \
     -j REDIRECT --to-port "$APP_PORT" 2>/dev/null || true
 
   # Remove INPUT filter rules
@@ -47,7 +56,7 @@ cleanup() {
     -m conntrack --ctorigdstport 80 \
     -j DROP 2>/dev/null || true
 
-  # Remove app-port block rule
+  # Remove direct app-port block rule
   iptables -D INPUT -i "$IFACE" -p tcp \
     -m conntrack --ctorigdstport "$APP_PORT" \
     -j DROP 2>/dev/null || true
@@ -60,13 +69,18 @@ http_code() {
 
 echo ""
 echo -e "${CYAN}══════════════════════════════════════════════════════${NC}"
-echo -e "${CYAN}  Test 2: Full Pipeline (PREROUTING REDIRECT +        ${NC}"
-echo -e "${CYAN}          conntrack ctorigdstport + string match)      ${NC}"
+echo -e "${CYAN}  Test 2: Full Pipeline (PREROUTING 80→app direct +  ${NC}"
+echo -e "${CYAN}          conntrack ctorigdstport + string match)     ${NC}"
 echo -e "${CYAN}══════════════════════════════════════════════════════${NC}"
 echo ""
-echo "  Traffic flow under test:"
-echo "    client → :80 → [PREROUTING 80→443] → [PREROUTING 443→$APP_PORT] → app"
-echo "    INPUT filter uses ctorigdstport to identify original-port-80 packets"
+echo "  Traffic flow under test (webroot renewal / initial cert issuance):"
+echo "    LE validator → :80 → [PREROUTING 80→$APP_PORT] → HTTP app serves challenge"
+echo ""
+echo "  NOTE: The 80→443→app path is for normal user HTTPS traffic only."
+echo "        LE sends plain HTTP — routing through 443 (TLS listener) breaks it."
+echo "        Pre/post renewal hooks swap the iptables rule to 80→app for the"
+echo "        validation window, then restore 80→443 afterwards."
+echo "        See renewal-hooks/ in this test directory."
 echo ""
 
 # ── Setup ──────────────────────────────────────────────────────────────────
@@ -92,9 +106,9 @@ fi
 # ── Apply rules ────────────────────────────────────────────────────────────
 echo ""
 echo "  [Applying PREROUTING REDIRECT rules]"
-iptables -t nat -A PREROUTING -i "$IFACE" -p tcp --dport 80  -j REDIRECT --to-port 443
-iptables -t nat -A PREROUTING -i "$IFACE" -p tcp --dport 443 -j REDIRECT --to-port "$APP_PORT"
-info "80 → 443 → $APP_PORT (PREROUTING nat)"
+# Direct: port 80 → APP_PORT (plain HTTP to plain HTTP app — no 443 TLS hop)
+iptables -t nat -A PREROUTING -i "$IFACE" -p tcp --dport 80 -j REDIRECT --to-port "$APP_PORT"
+info "80 → $APP_PORT direct (PREROUTING nat) — correct path for HTTP-01 validation"
 
 echo ""
 echo "  [Applying INPUT filter rules (using ctorigdstport)]"
@@ -123,16 +137,16 @@ echo ""
 echo "  [Allow cases — must return HTTP 200 via port 80]"
 hr
 
-# ACME challenge via port 80 (goes through 80→443→$APP_PORT redirect chain)
+# ACME challenge via port 80 (plain HTTP → 80→APP_PORT redirect)
 STATUS=$(http_code "http://127.0.0.1:80/.well-known/acme-challenge/pipelinetoken")
-[ "$STATUS" = "200" ] && pass "ACME challenge via :80 allowed (ctorigdstport=80, string match)" \
+[ "$STATUS" = "200" ] && pass "ACME challenge via :80 allowed (ctorigdstport=80 + string match)" \
                         || fail "ACME challenge via :80 blocked (HTTP $STATUS)"
 
-# ACME challenge direct on app port should still work (conntrack sees ctorigdst=$APP_PORT, not 80)
+# ACME challenge direct on app port should still work (ctorigdst=APP_PORT, not filtered)
 STATUS=$(http_code "http://127.0.0.1:$APP_PORT/.well-known/acme-challenge/pipelinetoken")
 [ "$STATUS" = "200" ] \
-  && note "ACME on direct app port :$APP_PORT also accessible (ctorigdst=$APP_PORT, no ACME filter applied)" \
-  || note "ACME on direct app port :$APP_PORT blocked (ctorigdst=$APP_PORT DROP rule active)"
+  && note "Certbot localhost can still reach :$APP_PORT directly (ctorigdst=$APP_PORT, no port-80 filter applied)" \
+  || note "Direct :$APP_PORT ACME path blocked (ctorigdst=$APP_PORT DROP rule active)"
 
 echo ""
 echo "  [Block cases — must timeout/refuse]"
@@ -154,20 +168,8 @@ hr
 
 STATUS=$(http_code "http://127.0.0.1:$APP_PORT/")
 [ "$STATUS" = "0" ] || [ "$STATUS" = "000" ] \
-  && pass "Direct :$APP_PORT access blocked (prevents HTTP bypass of HTTPS)" \
-  || fail "Direct :$APP_PORT access NOT blocked (HTTP $STATUS) — security gap!"
-
-echo ""
-echo "  [Port 443 behavior — should redirect to app, no ACME filter]"
-hr
-
-# Port 443 traffic goes through 443→$APP_PORT but is NOT subject to the port-80 ACME filter
-STATUS=$(http_code "http://127.0.0.1:443/")
-if [ "$STATUS" = "200" ]; then
-  pass "Port 443 traffic (redirect to app) unaffected by port-80 ACME filter"
-elif [ "$STATUS" = "0" ] || [ "$STATUS" = "000" ]; then
-  note "Port 443 blocked — if no TLS server is listening this is expected on loopback"
-fi
+  && pass "Direct :$APP_PORT access blocked (prevents plain-HTTP bypass of HTTPS)" \
+  || fail "Direct :$APP_PORT NOT blocked (HTTP $STATUS) — security gap!"
 
 # ── Summary ───────────────────────────────────────────────────────────────
 echo ""
